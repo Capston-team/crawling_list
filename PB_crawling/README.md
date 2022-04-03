@@ -11,7 +11,9 @@
 ---
 
 ## 부가 설명
-* 코드의 11,12 줄은 저의 맥북이 chromedriver를 인식하지 못해서 작성한 코드 입니다.
 
-
-
+맥북이 chromedriver를 인식하지 못해서 넣은 코드 입니다.
+```python
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service)
+```
