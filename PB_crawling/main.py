@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import time
+import pandas as pd
 
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service)
@@ -85,6 +86,7 @@ for list in city_list:
     time.sleep(1)
     src = driver.page_source
     soup = BeautifulSoup(src, 'lxml')
+    time.sleep(1)
 
     # 페이지에서 매장명, 주소, 위도, 경도 가져오기
     store_list = soup.findAll('div', {'class': 'store-list-item'})
@@ -98,20 +100,15 @@ for list in city_list:
 
     pb.append({'Branch': name, 'Location': addr, 'Latitude': latitude, 'Longitude': longitude})
 
-    # print(pb)
 
-
-# csv 파일에 쓰기
 def set_data(pb):
-    f = open('PB.csv', 'w', newline='')
-    fieldname = ['Branch', 'Location', 'Latitude', 'Longitude']
-    writer = csv.DictWriter(f, fieldnames=fieldname)
-    writer.writeheader()
+    branches = [branch for b_data in pb for branch in b_data['Branch']]
+    locations = [location for l_data in pb for location in l_data['Location']]
+    latitudes = [latitude for lat_data in pb for latitude in lat_data['Latitude']]
+    longitudes = [longitude for long_data in pb for longitude in long_data['Longitude']]
 
-    for i in range(len(store_list)):
-        for j in pb:
-            writer.writerow({'Branch': j['Branch'][i], 'Location': j['Location'][i],
-                             'Latitude': j['Latitude'][i], 'Longitude': j['Longitude'][i]})
+    df = pd.DataFrame({'Branch' : branches, 'Location': locations, 'Latitude': latitudes, 'Longitude': longitudes})
+    df.to_csv('PB.csv', index=False, encoding='utf-8')
 
 
 set_data(pb)
